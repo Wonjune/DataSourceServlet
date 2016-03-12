@@ -1,29 +1,23 @@
 package spms.listeners;
 
+import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
-import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
 
 import spms.dao.MemberDao;
 
 @WebListener
 public class ContextLoaderListener implements ServletContextListener{
-
-	BasicDataSource ds;
 	
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		try{
 			ServletContext sc = event.getServletContext();
-			
-			ds = new BasicDataSource();
-			ds.setDriverClassName(sc.getInitParameter("driver"));
-			ds.setUrl(sc.getInitParameter("url"));
-			ds.setUsername(sc.getInitParameter("username"));
-			ds.setPassword(sc.getInitParameter("password"));
+			InitialContext initialContext = new InitialContext();
+			DataSource ds = (DataSource)initialContext.lookup("java:comp/env/jdbc/studydb");
 
 			MemberDao dao = new MemberDao();
 			dao.setDataSource(ds);
@@ -34,12 +28,5 @@ public class ContextLoaderListener implements ServletContextListener{
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent event) {
-		try{
-			if(ds != null) ds.close();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-	}
+	public void contextDestroyed(ServletContextEvent event) { }
 }

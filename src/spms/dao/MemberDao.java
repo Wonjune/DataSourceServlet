@@ -5,28 +5,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
+import javax.sql.DataSource;
 
-import spms.util.DBConnectionPool;
 import spms.vo.*;
 
 public class MemberDao{
 	
-	DBConnectionPool pool;
+	DataSource ds;
 	Connection conn = null;
 	PreparedStatement pstmt = null;
 	ResultSet rs = null;
 	
-	public void setDBConnectionPool(DBConnectionPool pool){
-		this.pool = pool;
+	public void setDataSource(DataSource ds){
+		this.ds = ds;
 	}
 	
 	public ArrayList<Member> selectList() throws Exception{
 		ArrayList<Member> members = new ArrayList<Member>();
 		
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("select mno, email, mname, cre_date from members order by mno asc");
 			rs = pstmt.executeQuery();
 			
@@ -42,7 +40,7 @@ public class MemberDao{
 		}finally{
 			try{ if(rs != null){ rs.close(); }}catch(Exception e){}
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 		
 		return members;
@@ -50,7 +48,7 @@ public class MemberDao{
 	
 	public int insert(Member member) throws Exception {
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("insert into members(mname, email, pwd, cre_date, mod_date) values (?,?,?,now(),now())");
 			pstmt.setString(1, member.getName());
 			pstmt.setString(2, member.getEmail());
@@ -61,13 +59,13 @@ public class MemberDao{
 			throw e;
 		}finally{
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 	}
 	
 	public Member selectOne(int no) throws Exception {
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("select mname, email, pwd, cre_date, mod_date from members where mno = ?");
 			pstmt.setInt(1, no);
 			rs = pstmt.executeQuery();
@@ -89,13 +87,13 @@ public class MemberDao{
 		}finally{
 			try{ if(rs != null){ rs.close(); }}catch(Exception e){}
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 	}
 	
 	public int update(Member member) throws Exception {
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("update members set mname = ?, email = ?, pwd = ?, mod_date = now() where mno = ?");
 			pstmt.setString(1, member.getName());
 			pstmt.setString(2, member.getEmail());
@@ -107,13 +105,13 @@ public class MemberDao{
 			throw e;
 		}finally{
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 	}
 	
 	public int delete(int no) throws Exception {
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("delete from members where mno = ?");
 			pstmt.setInt(1, no);
 			return pstmt.executeUpdate();
@@ -122,13 +120,13 @@ public class MemberDao{
 			throw e;
 		}finally{
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 	}
 	
 	public Member exist(String email, String password) throws Exception {
 		try{
-			conn = pool.getConnection();
+			conn = ds.getConnection();
 			pstmt = conn.prepareStatement("select email, mname from members where email = ? and pwd = ?");
 			pstmt.setString(1, email);
 			pstmt.setString(2, password);
@@ -145,7 +143,7 @@ public class MemberDao{
 		}finally{
 			try{ if(rs != null){ rs.close(); }}catch(Exception e){}
 			try{ if(pstmt != null){ pstmt.close(); }}catch(Exception e){}
-			pool.returnConnection(conn);
+			try{ if(conn != null){ conn.close(); }}catch(Exception e){}
 		}
 	}
 }

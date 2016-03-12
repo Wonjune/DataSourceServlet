@@ -16,7 +16,7 @@
 비밀번호 : <input type='password' name='password' value=${member.password }/><br>
 가입일 : ${member.createDate }<br>
 수정일 : ${member.modifiedDate }<br>
-<input type='submit' value='수정'/> <input type='button' value='삭제' onclick='location.href=\"delete?no=" + no + "\"'/> <input type='button' value='취소' onclick='location.href=\"list\"'/>
+<input type='submit' value='수정'/> <input type='button' value='삭제' onclick='location.href="delete?no=${member.no }"'/> <input type='button' value='취소' onclick='location.href="list"'/>
 </form>
 <jsp:include page="/tail.jsp"/>
 </body>

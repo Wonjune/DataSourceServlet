@@ -1,32 +1,32 @@
 package spms.listeners;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.apache.commons.dbcp.BasicDataSource;
+
 import spms.dao.MemberDao;
-import spms.util.DBConnectionPool;
 
 @WebListener
 public class ContextLoaderListener implements ServletContextListener{
 
-	DBConnectionPool pool = null;
+	BasicDataSource ds;
 	
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		try{
 			ServletContext sc = event.getServletContext();
-			pool = new DBConnectionPool(sc.getInitParameter("driver")
-					, sc.getInitParameter("url")
-					, sc.getInitParameter("username")
-					, sc.getInitParameter("password"));
+			
+			ds = new BasicDataSource();
+			ds.setDriverClassName(sc.getInitParameter("driver"));
+			ds.setUrl(sc.getInitParameter("url"));
+			ds.setUsername(sc.getInitParameter("username"));
+			ds.setPassword(sc.getInitParameter("password"));
 
 			MemberDao dao = new MemberDao();
-			dao.setDBConnectionPool(pool);
+			dao.setDataSource(ds);
 			sc.setAttribute("memberDao", dao);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -36,7 +36,7 @@ public class ContextLoaderListener implements ServletContextListener{
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		try{
-			pool.closeAll();
+			if(ds != null) ds.close();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

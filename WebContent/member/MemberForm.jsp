@@ -13,7 +13,7 @@
 		이름 : <input type='text' name='name' /><br>
 		이메일 : <input type='text' name='email' /><br>
 		비밀번호 : <input type='password' name='password' /><br>
-	<input type='submit' value='추가'/> <input type='reset' value='취소'/>
+	<input type='submit' value='추가'/> <input type='reset' value='취소'/> <input type='button' value='리스트로' onclick='location.href="list"'/>
 	</form>
 	<jsp:include page="/tail.jsp"/>
 </body>
